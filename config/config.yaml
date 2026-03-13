@@ -1,0 +1,9 @@
+data:
+  phishing_path: "data/raw/phishing.csv"
+  legit_path:     "data/raw/legitimate.csv"
+  test_size: 0.20
+  balance_classes: true
+
+model:
+  n_estimators: 120
+  random_state: 42

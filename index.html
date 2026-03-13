@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhishCheck - URL Safety Checker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      color: #222;
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* ── Light mode (default) ── */
+    body.light {
+      background:/* linear-gradient(
+        rgba(245, 248, 255, 0.88),
+        rgba(240, 244, 255, 0.92)
+      ),
+      /*  
+      
+        Your custom background image goes here.
+        1. Upload your image to any free host (imgur, postimages, etc.)
+        2. Get the direct link (ends with .jpg / .png)
+        3. Replace the URL below
+      */
+       url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqbtBURugUePkUrE5TGQBZAKX5tHssAbur2g&s') center center / cover no-repeat fixed; 
+      /*background-color: #f5f5f5; /* fallback if image is commented */
+    }
+
+    /* ── Dark mode ── */
+    body.dark {
+      background: linear-gradient(
+        rgba(15, 23, 42, 0.92),
+        rgba(30, 41, 59, 0.88)
+      ),
+      /* 
+        You can also use a different image for dark mode if you want
+        Just uncomment and change the URL
+      */
+      /* url('data:image/jpeg;base64,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') center center / cover no-repeat fixed; */
+      background-color: #0f172a; /* dark slate fallback */
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto 40px;
+      background: rgba(255, 255, 255, 0.97);
+      padding: 35px 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+      backdrop-filter: blur(5px);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark .container {
+      background: rgba(30, 41, 59, 0.94);
+      color: #e2e8f0;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.4);
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    h1 {
+      color: #1d4ed8;
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+    }
+
+    body.dark h1 {
+      color: #60a5fa;
+    }
+
+    .subtitle {
+      color: #444;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+    }
+
+    body.dark .subtitle {
+      color: #94a3b8;
+    }
+
+    /* Dark mode toggle button */
+    #theme-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    #theme-toggle:hover {
+      background: rgba(0,0,0,0.08);
+    }
+
+    body.dark #theme-toggle:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .description {
+      background: #f0f9ff;
+      border-left: 5px solid #3b82f6;
+      padding: 16px 20px;
+      margin: 20px 0 35px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 1.05rem;
+      color: #334155;
+    }
+
+    body.dark .description {
+      background: #1e293b;
+      border-left-color: #60a5fa;
+      color: #cbd5e1;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-bottom: 35px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 1.15rem;
+    }
+
+    input[type="url"] {
+      padding: 15px 18px;
+      font-size: 1.1rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      width: 100%;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    body.dark input[type="url"] {
+      background: #1e293b;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+    }
+
+    body.dark input[type="url"]:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 4px rgba(96,165,250,0.25);
+    }
+
+    button {
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    /* Spinner */
+    #loading {
+      display: none;
+      text-align: center;
+      margin: 40px 0;
+      font-size: 1.3rem;
+      color: #4b5563;
+    }
+
+    body.dark #loading {
+      color: #94a3b8;
+    }
+
+    .spinner {
+      width: 65px;
+      height: 65px;
+      margin: 20px auto;
+      border: 7px solid #e5e7eb;
+      border-top: 7px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    body.dark .spinner {
+      border-color: #475569;
+      border-top-color: #60a5fa;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Result */
+    #result {
+      margin-top: 35px;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      display: none;
+    }
+
+    body.dark #result {
+      background: #1e293b;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    #result.danger {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+      color: #991b1b;
+    }
+
+    body.dark #result.danger {
+      background-color: #7f1d1d;
+      color: #fecaca;
+    }
+
+    #result.safe {
+      border-color: #10b981;
+      background-color: #ecfdf5;
+      color: #065f46;
+    }
+
+    body.dark #result.safe {
+      background-color: #064e3b;
+      color: #a7f3d0;
+    }
+
+    .result-title {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .result-url {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 18px 0;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 1.1rem;
+    }
+
+    body.dark .result-url {
+      background: #0f172a;
+    }
+
+    .confidence {
+      font-size: 2.4rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .risk-list {
+      margin-top: 25px;
+    }
+
+    .risk-list h4 {
+      margin-bottom: 14px;
+      font-size: 1.25rem;
+    }
+
+    .risk-list ul {
+      padding-left: 30px;
+      list-style: disc;
+    }
+
+    .risk-list li {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .error {
+      color: #dc2626;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    body.dark .error {
+      color: #f87171;
+    }
+  </style>
+</head>
+<body class="light">
+
+  <div class="container">
+    <header>
+      <h1>PhishCheck</h1>
+      <p class="subtitle">Protect yourself from online scams</p>
+      <button id="theme-toggle" title="Toggle dark/light mode">🌙</button>
+    </header>
+
+    <div class="description">
+      <strong>What is phishing?</strong><br>
+      Phishing is a type of cyber attack where criminals pretend to be trustworthy companies (banks, PayPal, Amazon, etc.) to trick you into giving away passwords, credit card details, or personal information. They usually send fake emails or create fake websites that look real. Always check URLs carefully before entering any sensitive information!
+    </div>
+
+    <form id="urlForm">
+      <label for="urlInput">Enter URL to check:</label>
+      <input 
+        type="url" 
+        id="urlInput" 
+        placeholder="https://example.com" 
+        required 
+      />
+      <button type="submit" id="checkBtn">Check URL</button>
+    </form>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      Checking URL… please wait
+    </div>
+
+    <div id="result">
+      <div class="result-title" id="title"></div>
+      <div class="result-url" id="urlDisplay"></div>
+      <div class="confidence" id="confidence"></div>
+      <div class="risk-list" id="riskSection">
+        <h4>Suspicious indicators:</h4>
+        <ul id="riskList"></ul>
+      </div>
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script>
+    // ── Dark mode toggle ────────────────────────────────────────
+    const toggleBtn = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    // Check saved preference or system preference
+    if (localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      body.classList.remove('light');
+      body.classList.add('dark');
+      toggleBtn.textContent = '☀️';
+    } else {
+      body.classList.remove('dark');
+      body.classList.add('light');
+      toggleBtn.textContent = '🌙';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      if (body.classList.contains('light')) {
+        body.classList.remove('light');
+        body.classList.add('dark');
+        toggleBtn.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.remove('dark');
+        body.classList.add('light');
+        toggleBtn.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // ── Form logic (unchanged) ──────────────────────────────────
+    const form = document.getElementById('urlForm');
+    const resultDiv = document.getElementById('result');
+    const title = document.getElementById('title');
+    const urlDisplay = document.getElementById('urlDisplay');
+    const confidenceEl = document.getElementById('confidence');
+    const riskSection = document.getElementById('riskSection');
+    const riskList = document.getElementById('riskList');
+    const loading = document.getElementById('loading');
+    const errorMsg = document.getElementById('errorMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) return;
+
+      resultDiv.style.display = 'none';
+      loading.style.display = 'block';
+      errorMsg.textContent = '';
+      riskList.innerHTML = '';
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/detect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || 'Server error');
+        }
+
+        const data = await response.json();
+
+        title.textContent = data.is_phishing 
+          ? '⚠️ Phishing Detected' 
+          : '✅ Looks Safe';
+
+        urlDisplay.textContent = data.url;
+        confidenceEl.textContent = `Confidence: ${(data.confidence * 100).toFixed(1)}%`;
+
+        if (data.risk_factors?.length > 0) {
+          riskSection.style.display = 'block';
+          data.risk_factors.forEach(factor => {
+            const li = document.createElement('li');
+            li.textContent = factor.replace(/_/g, ' ');
+            riskList.appendChild(li);
+          });
+        } else {
+          riskSection.style.display = 'none';
+        }
+
+        resultDiv.className = 'result-box ' + (data.is_phishing ? 'danger' : 'safe');
+        resultDiv.style.display = 'block';
+
+      } catch (err) {
+        errorMsg.textContent = 'Error: ' + err.message;
+      } finally {
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+</html>
